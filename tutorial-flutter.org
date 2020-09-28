@@ -1,0 +1,40 @@
+#+TITLE: tutorial-flutter
+#+AUTHOR: Maxxcan Fox
+#+EMAIL: maxxcan@disroot.org
+#+DATE: <2020-09-28 lun>
+
+* Introducción 
+
+Flutter es un framework open source para crear alta calidad, alto desempeño aplicaciones móviles a través de sistemas operativos - Android e iOS. Proporciona un simple, potente, eficiente y fácil de entender SDK para escribir aplicaciones móviles en un lenguaje propio de Google, Dart. 
+
+** Característica de Flutter
+
+El framework Flutter ofrece las siguientes características a los desarrolladores - 
+
++ Un framework moderno y reactivo
++ Usa el lenguaje de programación Dart que es muy fácil de aprender 
++ Rápido desarrollo 
++ Bellos y fluidos interfaces de usuario 
++ Un amplio catálogo de widget. 
++ Ejecuta el mismo UI para múltiples plataformas 
++ Aplicaciones de alto desempeño 
+
+** Ventajas de Flutter
+
+Flutter viene con ellos y personalizables widgets para elevado desempeño y espectaculares aplicaciones móviles. Cumple todos las necesidades y requerimientos. Además de eso, Flutter ofrece muchas más ventajas que mencionaremos a continuación - 
+
++ Dart tiene un gran repositorio de paquetes de software los cuales permiten extender las capacidades de nuestra aplicación. 
++ Los desarrolladores necesitan escribir un código base para ámbas aplicaciones(Android e iOS). Flutter puede ser extendido a otras plataformas como son la web, o el escritorio en distintos sistemas operativos como son Linux, Windows o Mac. 
++ Flutter necesita menos testeo. Porque con su código base es suficiente si escribimos test automatizados para ámbas plataformas.
++ La simplicidad de Flutter hacer que sea un buen candidato para un desarrollo rápido. Su capacidad de personalización y extensión lo hace incluso más poderoso. 
++ Con Flutter, los desarrolladores tiene total control sobre los widgets y sus capas. 
++ Flutter ofrece grandes herramientas a los desarrolladores, con el increíble recarga en caliente. 
+
+** Desventajas de Flutter 
+
+A pesar de sus muchas ventajas, flutter tiene las siguientes desventajas - 
+
++ Como su código es en el lengauje Dart, un desarrollador tiene que aprender un nuevo lenguaje (aunque sea fácil de aprender).
++ Los modernos frameworks intentan separar la lógica y el UI tanto como sea posible pero, en Flutter, la interfaz de usuario y la lógica están intremezclados.  Podemos superar esto usando un código inteligente y usando un elevado nivel de módulos para separar la interfaz de usuario de la lógica. 
++ Flutter es todavía otro framework para crear aplicaciones móviles. Los desarrolladores tienen todavía un duro momento en elegir las correctas herramientas de desarrollo en tan grande segmento. 
+
