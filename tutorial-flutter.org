@@ -38,3 +38,51 @@ A pesar de sus muchas ventajas, flutter tiene las siguientes desventajas -
 + Los modernos frameworks intentan separar la lógica y el UI tanto como sea posible pero, en Flutter, la interfaz de usuario y la lógica están intremezclados.  Podemos superar esto usando un código inteligente y usando un elevado nivel de módulos para separar la interfaz de usuario de la lógica. 
 + Flutter es todavía otro framework para crear aplicaciones móviles. Los desarrolladores tienen todavía un duro momento en elegir las correctas herramientas de desarrollo en tan grande segmento. 
 
+* Arquitectura de una aplicación 
+
+** Widgets 
+
+El concepto fundamental de Flutter es que *en Flutter, todo es un Widget*. Los Widgets son básicamente componentes de la interfaz de usuario usados para crear la interfaz de usuario de la aplicación. 
+
+En /Flutter/, la aplicación en sí misma es un widget. La aplicación es el widget de más alto nivel y su UI está construida usando uno o más widgets hijos, los cuales de nuevo están construidos usando sus widgets hijos. Esta *componibilidad* ayuda a crear una interfaz de usuario de cualquier complejidad. 
+
+Por ejemplo, la jerarquía de una aplicación "hola mundo" seguiría el siguiente diagrama - 
+
+
+[[./images/hello-world.png]]
+
+
+Los puntos más notables - 
+
++ /MyApp/ es el widget creado por el usuario y está construido usando el widget nativo, /MaterialApp/. 
++ /MaterialApp/ tiene una propiedad /home/ que especifica la página de inicio, la cual es creada de nuevo por el widget /MyHomePage/
++ /MyHomePage/ está construida usando otro widget nativo, /Scaffold/
++ /Scaffold/ tiene dos propiedades - /body/ y /appBar/
++ /body/ es usada para espcificar la interfaz de usuario principal y /appBar/ es usada para especificar la cabecera de la interfaz
++ La cabecera está construida usando el widget /AppBar/ y el cuerpo está construido usando el widget /Center/
++ El widget /Center/ tiene una propiedad, /Child/, la cual refiere al Verdadero contenido y está construido usando el widget /Text/
+
+** Gestos 
+
+Los widgets de Flutter soportan la interacción a través de un widget especial, /GestureDetector/. /GestureDetector/ es un widget invisible que tiene la capacidad de capturar las interacciones del usuario tals como tocar la pantalla, arrastrar, etc, de su widget hijo. Muchos widgets nativos de Flutter soportar interacción a través del uso  de /GestureDetector/. Podemos también incorporar características de interacción dentro de un widget existente componiendo con el widget /GestureDetector/. 
+
+** Concepto de Estado 
+
+Los widgets de Flutter soportan el mantenimiento de Estado proporcionando un widget especial, /StatefulWidget/. El widget necesita ser derivado desde /StatefulWidget/ para soportar el mantenimiento de estado y todos los otros widget los otros widgets debería ser derivados desde /StatefulWidget/. Los widgets de Flutter son *reactivos* en nativo. Esto es similar a reactjs y /StatefulWidget/ será auto redibujado cada vez que el estado interno sea cambiado. El redibujado es optimizado para encontrar las diferencias entre el widget viejo y el nuevo y redibuja solo lo necesario. 
+
+** Capas 
+
+El concepto más importante de Flutter es que el framework está agrupado en múltiples categorias en terminos de complejidad y claramente organizado en capas de complejidad descendiente. Una capa está construida usando su inmediato próximo nivel de capa. La capa más alta es un widget específico de Android e iOS. La siguiente capa tienen todos los widgets nativos. La siguiente es la capa de dibujado, la cual es el más bajo nivel de componentes dibujados y dibuja todo en la aplicación de flutter. Capas hacia abajo llegamos al código específico del núcleo de la plataforma. 
+
+El resumen general de una capa en Flutter está especificado en el siguiente diagrama - 
+
+[[./images/layers.png]]
+
+
+Los siguientes puntos resumen la Arquitectura de Flutter - 
+
++ En Flutter, todo es un widget y un widget complejo está compuesto por widgets que ya existen. 
++ Las Características interativas puder ser incorporadas cuando sean necesarias usando el widget /GestureDetector/.
++ El estado de un widget pueder mantenido en cuando sea necesario usando el widget /StatefulWidget/.
++ Flutter ofrecer capas de diseño, así que cualquier capa puede ser programada dependiendo de la complejidad de la tarea.
+
