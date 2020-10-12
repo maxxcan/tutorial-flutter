@@ -86,3 +86,887 @@ Los siguientes puntos resumen la Arquitectura de Flutter -
 + El estado de un widget pueder mantenido en cuando sea necesario usando el widget /StatefulWidget/.
 + Flutter ofrecer capas de diseño, así que cualquier capa puede ser programada dependiendo de la complejidad de la tarea.
 
+
+* Introducción a los Widgets 
+
+Como ya hemos aprendido los widgets son todo en Flutter. En este capítulo, vamos a entender el verdadero concepto detrás de la creación de widgets y los diferentes tipos de widgtes que hay en Flutter. 
+
+Vamos a echarle un vistazo al widget MyHomePage de la aplicación Hola Mundo - 
+
+#+BEGIN_SRC dart
+  class MyHomePage extends StatelessWidget {
+    MyHomePage({Key key, this.title}) : super(key: key);
+
+    final String title;
+    @override 
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar(title: Text(this.title), ),
+	body: Center(child: Text ('Hola Mundo',)),
+      );
+    }
+  }
+#+END_SRC
+
+Aquí, hemos creado un nuevo widget por extensión de /StatelessWidget/. 
+
+/StatelessWidget/ solo requiere un simple método de construcción para ser implementado en su clase derivada. El método /build/ obtiene el contexto del desarrollo necesario para construir los widgets a través del parámetro /BuildContext/ y devuleve el widget que se ha construido. 
+
+En el código, hemos usado /title/ como uno de los argumentos el constructor y también hemos usado /Key/ como otro argumento. El /title/ es usada para mostrar el título y /Key/ es usado para identificar el widget en el entorno de construcción. 
+
+Aquí, el método /build/ llama el método /build/ de /Scaffold/, el cual devuelve la llamada al método /build/ de /AppBar/ y /Center/ para construir al interfaz del usuario. 
+
+Finalmente, /Center/ llamada al método /Text/.
+
+Por un mejor entendimiento, la representación visual de ésto es dada a continuación - 
+
+[[./images/representacion_visual.png]]
+
+
+
+** Visualización del Widget Build 
+
+En /Flutter/, los widgets pueder ser agrupados en múltiples categorias basados en sus características 
+
++ Widgets específicos de la plataforma 
++ Widgets de Capa
++ Widgets de mantenimiento de Estado 
++ Widgets básicos independientes de la plataforma 
+
+Vamos a ver cada uno de ellos a continuación 
+
+***   Widgets esspecíficos de la plataforma 
+
+Flutter tiene widgets específicos para una plataforma en particular - Android o iOS.
+
+Los widgets específicos para Android son diseñados conforme con /la guía de diseño Material/ por Android OS. Los widgets específicos para Android son llamados como /Material widgets/.
+
+Los widgets específicos para iOS son diseñados conforme con la /Guía de Interfaz Humana/ de Apple y son llamados /Cupertino widgets/.
+
+Algunos de los material widgets más usados son los siguientes - 
+
++ Scaffold 
++ AppBar
++ BottomNavigationBar
++ TabBar
++ TabBarView
++ ListTile
++ RaisedButton
++ FloatingActionButton
++ FlatButton
++ IconButton
++ DropdownButton
++ PopupenuButton
++ ButtonBar
++ TextField
++ Checkbox
++ Radio
++ Switch
++ Slider
++ Date & Time Pickers
++ SimpleDialog
++ AlertDialog
+
+Algunos de los widgets /Cupertino/ más usados son los siguientes -
+
++ CupertinoButton
++ CupertinoPicker
++ CupertinoDatePicker
++ CupertinoTimePicker
++ CupertinoNavigationBar
++ CupertinoTabBar
++ CupertinoTabSCaffold
++ CupertinoTabView
++ CupertinoTextField
++ CupertinoDialog
++ CupertinoDialogAction
++ CupertinoFullscreenDialogTransition
++ CupertinoPageScaffold
++ CupertinoPageScaffold
++ CupertinoPageTransition
++ CupertinoActionSheet
++ CupertinoActivityIndicator
++ CupertinoAlertDialog
++ CupertinoPopupSurface
++ CupertinoSlider 
+
+** Widgets de Capa  
+
+En Flutter, un widget puder ser creado por composición de uno o más widgets. Para componer multiples widgets en un solo widget, /Flutter/ proporciona un gran número de widgets con características de capa. Por ejemplo, el widget /child/ puede ser centrado usando el widget /Center/. 
+
+Algunos de los widgets de capa más populares son los siguientes - 
+
++ *Container* - Es una caja rectangular decorada usando el widget /BoxDecoration/ con fondo, borde y sombra. 
++ *Center* - Es un widget hijo
++ *Row* - Coloca sus hijos en dirección horizontal
++ *Column* - Coloca sus hijos en dirección vertical
++ *Stack* - Coloca uno sobre otro 
+
+Veremos de forma más detenida estos widgets más adelante.
+
+** Widgets de mantenimiento de Estado 
+
+En Flutter, todos los widgets son derivados de StatelessWidget o StatefulWidget.
+
+Los widgets derivados de StatelessWidget no tienen ninguna información de estado pero puede contener widget derivados de StatefulWidget. La naturaleza dinámica de la aplicación es a través del comportamiento interactivo de los widgets y que el estado cambie durante la interacción. Por ejemplo, tocar un botón contador que incrementa o decrementa el estado interno del contador por uno y la naturaleza reactiva de los widgets de Flutter que auto redibujará el widget usando la nueva información de estado. 
+
+Aprenderemos el concepto de los widgets /StatefulWidget/ en detalle en el siguiente capítulo.
+
+** Widgets independientes de plataforma y básicos  
+
+/Flutter/ proporciona un amplio número de widgets básicos para crear tanto simples como complejos interfaces de usuario de una forma independiente de la plataforma. Veremos algunos widgets básicos en este capítulo. 
+
+*** Text 
+
+El widget /Text/ es usado para mostrar una pieza de texto. El estilo de la cadena de texto puede ser establecida usando la propiedad /style/ y la clase /TextStyle/. El código para este propósito es el que sigue - 
+
+#+BEGIN_SRC dart 
+Text('Hola Mundo', style: TextStyle(fontWeight: FontWeight.bold))
+#+END_SRC
+
+El widget /Text/ tiene un constructor especial, /Text.rich/, el cual acepta el hijo de tipo /TextSpan/ para especificar el texto con diferentes estilos. El widget /TextSpan/ es recursivo en naturaleza y acepta /TextSpan/ como su propio hijo. El código de ejemplo para este propósito es el siguiente - 
+
+#+BEGIN_SRC dart 
+  Text.rich(
+    TextSpan(
+      children: <TextSpan>[
+	TextSpan(text: "Hola ", style:
+	  TextStyle(fontStyle: FontStyle.italic)),
+	TextSpan(text: "Mundo", style:
+	  TextStyle(fontWeight: FontWeight.bold)),
+      ],
+    ),
+  )
+#+END_SRC
+
+Las propiedades más importantes del widget /Text/ son las siguientes - 
+
++ *maxLines,int* Máximo número de líneas que mostrar
++ *overflow, TextOverFlow* - Especifica como es manejado el desborde, el cual es manejado por la clase /TextOverFlow/
++ *style, TextStyle* - Especifica el estilo de la cadena de texto usando la clase /TextStyle/
++ *textAlign, TextAlign* - Alineación del texto, derecha, izquirda, justificado, etc, usando la clase /TextAlign/
++ *textDirection, TextDirection* - Dirección del texto, puediendo elegir de izquierda a derecha o de derecha a izquierda
+
+*** Image 
+
+El widget /Image/ es usada para mostrar una imagen en la aplicación. El widget /Image/ proporciona diferentes constructores para cargar imagenes desde multiples fuentes y son los siguientes - 
+
++ *Image* - Cargador genérico de imágenes usando /ImageProvider/
++ *Image.asset* - Carga la imagen desde los recursos de un proyecto en Flutter
++ *Image.file* - Carga la imagen desde una carpeta del sistema 
++ *Image.memory* - Carga la imagen desde la memoria 
++ *Image.Network* - Carga la imagen desde la red 
+
+La opción más fácil para cargar y mostrar una imagen en /Flutter/ es que sea includia en los recursos de la aplicación y cargarla en el widget bajo demanda. 
+
++ Crear una carpeta
++ Especificar el recurso en el fichero pubspec.yaml tal como se muestra a continuación 
+
+#+BEGIN_SRC yaml
+  flutter:
+    assets:
+      - assets/smiley.png
+#+END_SRC
+
++ Ahora se carga y muestra la imagen en la aplicación. 
+
+#+BEGIN_SRC dart 
+  Image.asset('assets/smiley.png')
+#+END_SRC
+
+El código completo del widget /MyHomePage/ de la aplicación Hello World y el resultado se muestra a continuación - 
+
+#+BEGIN_SRC dart 
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar( title: Text(this.title), ),
+	body: Center( child: Image.asset("assets/smiley.png")),
+      );
+    }
+  }
+#+END_SRC
+
+Esto preoducirá la siguiente - 
+
+[[./images/smiley.png]]
+
+
+Las propiedades más importantes del widget /Image/ son las siguientes - 
+
++ *image,ImageProvider* - La verdadera imagen a mostrar
++ *width,double* - Anchura de la imagen
++ *height,double* - Altura de la imagen
++ *alignment,AlignmentGeometry* - como se alinea la imagen respecto a su marco 
+
+*** Icon  
+
+El widget /Icon/ es usado para mostrar un glifo desde una fuente descrita por la clase /IconData/. El código para cargar un icon de email es el siguiente - 
+
+#+BEGIN_SRC dart 
+Icon(Icons.email)
+#+END_SRC
+
+El código completo aplicado a nuestra aplicación Hello World es el siguiente - 
+
+#+BEGIN_SRC dart 
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold (
+	appBar: AppBar(title: Text(this.title),),
+	body: Center (child: Icon(Icons.email)),
+      );
+    }
+  }
+#+END_SRC
+
+Lo que mostrará nuestra aplicación será lo siguiente - 
+
+[[./images/email.png]]
+
+
+* Introducción a las capas  
+  
+Desde que el concepto central de /Flutter/ es que /Todo/ es un /widget/, /Flutter/ incorpora una funcionalidad de capa para la interfaz de usuario dentro de los widgets en sí mismo. /Flutter/ proporciona bastantes widgets especialmente diseñados como /Container/, /Center/, /Align/, etc, solo para le propósito de trabajar con capas en la interfaz de usuario. Los widgets construidos por composición de otros widgets normalmente usan widgets de capa. Vamos a aprender el concepto de capa en /Flutter/ en este capítulo. 
+
+** Tipos de Widgets de Capa 
+
+Los widgets de capa pueden ser agrupados en dos categorias distintas basados en sus hijos - 
+
++ Widgets que soportan un solo hijo 
++ Widgets que soportan multiples hijos 
+
+Aprendamos ambos tipos de widgets y su funcionalidad en las siguientes secciones. 
+
+** Widgets con un solo hijo 
+
+En esta categoría, los widgets tendrán solo un widget como su hijo y cada widget tendrá una capa de funcionalidad especial. 
+
+Por ejemplo, el widget /Center/ solo centra su widget hijo con respsecto a su widget padre y el widget /Container/ proporciona completa flexibilidad para localizar su hijo en cualquir lugar dado dentro de él usando diferentes opciones como padding, decoration, etc. 
+
+Los widgets de un solo hijo son grandes opciones para crear widgets de alta calidad teniendo una sola funcionalidad tales como botones, etiquetas, etc. 
+
+el código para crear un simple botón usando el widget /Container/ es el siguiente - 
+
+#+BEGIN_SRC dart
+  class MyButton extends StatelessWidget{
+    MyButton({Key key}) : super(key: key);
+
+    @override
+    Widget build(BuildContext context){
+      return Container(
+	decoration: const BoxDecoration(
+	  border: Border(
+	    top: BorderSide(width: 1.0, color: Color(0xFFFFFFFFFF)),
+	    left: BorderSide(width: 1.0, color: Color(0xFFFFFFFFFF)),
+	    right: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+	    bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+	  ),
+	),
+	child: Container(
+	  padding: const
+	  EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0),
+	  decoration: const BoxDecoration(
+	    border: Border(
+	      top: BorderSide(width: 1.0, color: Color(0xFFFFDFDFDF)),
+	      left: BorderSide(width: 1.0, color: Color(0xFFFFDFDFDF)),
+	      right: BorderSide(width: 1.0, color: Color(0xFFFF7F7F7F)),
+	    ),
+	    color: Colors.grey,
+	  ),
+	  child: const Text(
+	    'OK',textAlign: TextAlign.center, style: TextStyle(color: Colors.black)
+	  ),
+	),
+      );
+    }
+  }
+#+END_SRC 
+
+Aquí, hemos usado dos widgets - un widget /Container/ y un widget /Text/. El resultado del widget es un botón a la medida como se ve a continuación - 
+
+[[./images/ok.png]]
+
+
+Comprobemos algunos de los más importantes widgets de un solo hijo proporcionados por /Flutter/ - 
+
++ *Padding* - Usado para ordenar su widget hijo con el relleno dado. Aquí, el relleno puede ser proporcionado por la clase /EdgeInsets/. 
++ *Align* - Alinea su widget hijo en sí mismo usando el valor de la propiedad /alignment/. El valor de la propiedad /alignment/ puede ser proporcionada por la clase /FractionalOffset/. La clase /FractionalOffset/ especifica la compensación en terminos de una distancia desde la parte de arriba a la izquierda. 
+
+Algunos de los valores posibles de compensación son los siguientes - 
+
++ FractionalOffset(1.0, 0.0) representa la parte arriba derecha 
++ FractionalOffset(0.0, 1.0) representa la parte abajo izquierda.
+
+Un código sobre las compensaciones (offsets) es mostrado a continuación - 
+
+#+BEGIN_SRC dart 
+  Center(
+    child: Container(
+      height: 100.0,
+      width: 100.0,
+      color: Colors.yellow, child: Align(
+	alignment: FractionalOffset (0.2, 0.6),
+	child: Container( height: 40.0, width:
+	  40.0, color: Colors.red,
+	),
+      ),
+    ),
+  )
+#+END_SRC
+
++ *FittedBox* - Escala el widget hijo y entonces lo posiciona acorde a un espacio especificado.
++ *AspectRatio* - Intenta cambiar el tamaño del widget hijo a una proporción especificada
++ ConstrainedBox
++ Baseline
++ FractinallySizedBox
++ IntrinsicHeight
++ IntrinsicWidth
++ LimitedBox
++ OffStage
++ OverflowBox
++ SizedBox
++ SizedOverflowBox
++ Transform
++ CustomSingleChildLayout
+
+Nuestra aplicación Hello World está usando material basado en widgets de capa para diseñar la página principal. Modificaremos nuestra aplicación Hello World para construir la página principal usando widgets de capa básicos como especificamos antes - 
+
++ *Container* - Génerico, de hijo único, container basado en box con alineación, relleno, borde y márgen con Características de estilo ricas. 
++ *Center* - Simple, widget contenedor de hijo único, el cual centra su widget hijo. 
+
+El código modificado del widget /MyHomePage/ y /MyApp/ es el siguiente - 
+
+#+BEGIN_SRC dart 
+  class MyApp extends StatelessWidget {
+    @override
+    Widget build(BuildContext context){
+      return MyHomePage(title: "Hello World demo app");
+    }
+  }
+
+  class MyHomepage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+    @override
+    Widget build(BuildContext context){
+      return Container(
+	decoration: BoxDecoration(color: Colors.white,),
+	padding: EdgeInsets.all(25), child: Center(
+	  child: Text(
+	    'Hello World', style: TextStyle(
+	      color: Colors.black, letterSpacing: 0.5, fontSize: 20,
+	    ),
+	    textDirection: TextDirection.ltr,
+	  ),
+	)
+      );
+    }
+  }
+#+END_SRC 
+
+
+Aquí 
+
++ Widget /Container/ está en lo más alto o widget raíz. /Container/ está configurado usando las propiedades /decoration/ y /padding/ para organizar su contenido.
++ /BoxDecoration/ tiene muchas propiedades como color, border, etc, para declarar el widget /Container/ y aquí, /color/ es usado para establecer el color del contenedor.
++ /padding/ del widget /Container/ es establecido usando la clase /IdgeInsets/, la cual proporciona la opción para especifica el valor de relleno. 
++ /Center/ es el widget hijo del widget /Container/. De nuevo, /Text/ es el hijo del widget /Center/. /Text/ es usada para mostrar el mensaje y /Center/ es usado para centrar el mensaje de texto con respecto a su widget padre, /Container/. 
+
+El resultado final del código dado se muestra a continuación. 
+
+[[./images/hola-final.png]]
+
+
+
+** Widgets con múltiples hijos
+
+En esta cateogoría, un widget dado tendrá más de un widget hijo y la capa de cada widget es única. 
+
+Por ejemplo, el widget /Row/ permite la disposición de sus widgets hijos en dirección horizontal, mientras que el widget /Column/ permite disponerlos en dirección vertical. Por composición /Row/ y /Column/, los widget con cualquier nivel de complejidad pueden ser construidos. 
+
+Aprendamos algunos de los widgets usados de forma más frecuente en esta sección. 
+
++ *Row* - Permite ordenar sus hijos de forma horizontal
++ *Column* - Permite ordenar a sus hijos de forma vertical
++ *ListView* - Permite ordenar a sus hijos como una lista
++ *GridView* - Permite ordenar a sus hijos como una galeria
++ *Expanded* - usado para hace que los hijos de los widgets Row y Column ocupen el máximo área posible
++ *Table* - Widget basado en tablas 
++ *Flow* - Widget basado en Flujo
++ *Stack* - Widget basado en pila 
+
+** Aplicaciones de capa avanzados 
+
+En esta sección, vammos a aprender como crear una interfaz de usuario compleja producto de listado con diseño personalizado usando tanto widgets de capa de un solo hijo como de múltiples. 
+
+Para este propósito, seguiremos la secuencia que se muestra a continuación - 
+
++ Crear una nueav aplicación /Flutter/ 
++ Reemplazar el código de /main.dart/ por el siguiente 
+
+#+BEGIN_SRC dart 
+  import 'package:flutter/material.dart';
+  void main() => runApp(MyApp());
+
+  class MyApp extends StatelessWidget {
+    //Este widget es la raíz de nuestra aplicación
+    @override
+    Widget build(BuildContext context){
+      return MaterialApp(
+	title: 'Flutter demo', theme: ThemeData(
+	  primarySwatch: Colors.blue,
+	),
+	home: MyHomePage(title: 'Product layout Demo Homepage'),
+      );
+    }
+  }
+
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar(title: Text(this.title),),
+	body: Center(child: Text('Hello World',)),
+      );
+    }
+  }
+#+END_SRC
+
+Aquí 
+
++ Hemos creado el widget /MyHomePage/ por extensión de /StatelessWidget/ en vez de /StatefulWidget/ y entonces hemos eliminado el código relevante.
++ Ahora, creamos un nuevo widget, /ProductBox/ acordando con el diseño especificado como se muestra a continuación - 
+
+[[./images/productbox.png]]
+
+
+El código de /ProductBox/ es el siguiente 
+
+#+BEGIN_SRC dart 
+  class Productox extends StatelessWidget{
+    ProductBox({Key key, this.name, this.description, this.price, this.image}) :super(key: key);
+    final String name;
+    final String description;
+    final int price;
+    final String image;
+
+    Widget build(BuildContext context){
+      return Container(
+	padding: EdgeInsetss.all(2), height: 120; child: Card(
+	  child: Row(
+	    mainAxisAlignment: MainAxisAlignment.spaceEvenly, children:<Widget>[
+	      Image.asset("assets/appimages/" +image), Expanded(
+		child: Container(
+		  padding: EdgeInsets.all(5), child: Column(
+		    mainAxisAlignment: MainAxisAlignment.spaceEVenly,
+		    children: <Widget>[
+
+		      Text(this.name, style: TextStyle(fontweight:
+			  FontWeigth.bold)), Text(this.description),ºº
+		      Text("Price: " + this.price.toString()),
+		    ],
+		  )
+		)
+	      )
+	    ] 
+	  )
+	)
+      );
+    }
+  }
+#+END_SRC
+
+
+Veamos el siguiente código 
+
++ /ProductBox/ ha sido usado por cuatro argumetnos especificados a continuación 
+  + name - Nombre del producto
+  + description - Descripción del producto
+  + price - Precio del producto 
+  + image - Imagen del producto
+
++ /ProductBox/ usa siete widgets que se especifican a continuación 
+  + Container
+  + Expanded
+  + Row
+  + Column
+  + Card
+  + Text 
+  + Image
+
++ /ProductBox/ es diseñado usando el widget mencionado a continuación. La jerarquía del widget es especificada en el diagrama que se muestra a continuación - 
+
+[[./images/jerarquia-producto.png]]
+
+
+Ahora pondremos algunas imágenes falsas para la información del producto en la carpeta de las imagenes de la aplicación y configuraremos el archivo pubspec.yaml como se muestra
+
+#+BEGIN_SRC yaml
+  assets:
+    - assets/appimages/floppy.png
+    - assets/appimages/iphone.png
+    - assets/appimages/laptop.png
+    - assets/appimages/pendrive.png
+    - assets/appimages/pixel.png
+    - assets/appimages/tablet.png
+#+END_SRC
+
+
+Finalmente, usaremos el widget /ProductBox/ en el widget /MyHomePage/ como mostramos a continuación - 
+
+#+BEGIN_SRC dart 
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({key key, this.title}) : super(key: key);
+    final String title;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar(title: Text("Product Listing")),
+	body: ListView(
+	  shrinkWrap: true, padding: const EdgeInsets.fromLTRB(2.0, 10.0, 2.0, 10.0),
+	  children: <Widget>[
+	    ProductBox(
+	      name: "iphone",
+	      description: "iPhone is the stylist phone ever",
+	      price: 1000,
+	      image: "iphone.png"
+	    ),
+	    ProductBox(
+	      name: "Pixel",
+	      description: "Pixel is the most featureful phone ever",
+	      price: 800,
+	      image: "pixel.png"
+	    ),
+	    ProductBox(
+	      name:"Laptop"
+	      description:"Laptop is most productive development tool",
+	      price:2000,
+	      image:"laptop.png"
+	    ),
+	    ProductBox(
+	      name:"Tablet",
+	      description:"Tablet is the most useful device ever for meeting",
+	      price:1500,
+	      image:"tablet.png"
+	    ),
+	    ProductBox(
+	      name:"Pendrive",
+	      description:"Pendrie is useful storage medium",
+	      price:100,
+	      image:"pendrive.png"
+	    ),
+	    ProductBox(
+	      name:"Floppy Drive",
+	      description:"Floppy drive is useful rescue storage medium",
+	      price:20,
+	      image:"floppy.png"
+	    ),
+          
+	  ],
+	)
+      );
+    }
+  }
+#+END_SRC
+
+
+Aquí, hemos usado /ProductBox/ como hijo del widget /ListView/.
+
+El código completo (main.dart) de la aplicación (product_layout_app) es el siguiente - 
+
+#+BEGIN_SRC dart 
+  import 'package:flutteer/material.dart';
+  void main() => runApp(MyApp());
+
+  class MyApp extends StatelessWidget{
+    // Este widget es la raíz de la aplicación.
+    @override
+    Widget build(BuildContext context){
+      return MaterialApp(
+	title: 'Flutter Demo', theme: ThemeData(
+	  primarySwatch: Colors.blue,
+	),
+	home: MyHomePage(title: 'Product layout demo home page'),
+      );
+    }
+  }
+
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : suer(key: key);
+    final String title;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar(title: Text("Product Listing")),
+	body: ListView(
+	  shrinkWrap: true,
+	  padding: const EdgeInsets.fromLTRB(2.0, 10.0, 2.0, 10.0),
+	  children: <Widget>[
+	    ProductBox(
+	      name: "IPhone",
+	      description:"Iphone es the stylist phone ever",
+	      price:1000,
+	      image:"iphone.png"
+	    ),
+	    ProductBox(
+	      name:"Pixel",
+	      description:"Pixel is the most featureful phone ever"
+	      price:800,
+	      image:"pixel.png"
+	    ),
+	    ProductBox(
+	      name:"Laptop",
+	      description:"Laptop is most productive development tool",
+	      price:2000,
+	      image:"laptop.png"
+	    ),
+	    ProductBox(
+	      name:"Tablet"
+	      description:"Tablet is the most useful device ever for meeting",
+	      price:1500,
+	      image:"tablet.png"
+	    ),
+	    ProductBox(
+	      name:"Pendrive",
+	      description:"Pendrive is useful storage medium",
+	      price:100,
+	      image:"pendrive.png"
+	    ),
+	    ProductBox(
+	      name:"Floppy Drive",
+	      description:"Floppy drive is useful rescue storage medium",
+	      price:20,
+	      image:"floppy.png"
+	    ),
+          
+	  ]
+	)
+      );
+    }
+  }
+
+  class ProductBox extends StatelessWidget{
+    ProductBox({Key key, this.name, this.description, this.price, this.image}) : suepr(key: key);
+    final String name;
+    final String description;
+    final int price;
+    final String image;
+
+    Widget build(BuildContext context){
+      return Container(
+	padding: EdgeInsets.all(2),
+	height: 120,
+	child: Card(
+	  child: Row(
+	    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+	    children: <Widget>[
+	      Image.asset("assets/appimages/" + image),
+	      Expanded(
+		child: Container(
+		  padding: EdgeInsets.all(5),
+		  child: Column(
+		    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+		    children: <Widget>[
+		      Text(
+			this.name, style: TextStyle(
+			  fontWeight: FontWeight.bold
+			)
+		      ),
+		      Text(this.description), Text(
+			"Price: " + this.price.toString()
+		      ),
+		    ],
+		  )
+		)
+	      )
+	    ]
+	  )
+	)
+      );
+    }
+  }
+
+#+END_SRC
+
+
+El resultado final será el siguiente - 
+
+[[./images/producto-final.png]]
+
+
+* Introducción a los Gestos 
+
+Los /Gestos/ son primariamente una forma para que un usuario pueda interactuar con una aplicación para  móvil (o cualquier dispositivo basado en tacto). Los Gestos son generalmente definidos como cualquier acción física o movimiento de un usuario con la inteción de activar un control específico del dispositivo móvil. Los Gestos son tan simples como tocar la pantalla del dispositivo móvil o acciones más complejas usadas en juegos. 
+
+Algunos de los gestos más usados son mencionados aquí - 
+
++ *Tap* Tocar la superfice del dispositivo con la punta de los dedos por un periodo corto. 
++ *Double Tap* - Tocar la pantalla en un corto espacio de tiempo.
++ *Drag* - Tocar la superficie del dispositivo con la punta del dedo y entonces moverlo de forma constante hasta volver a levantar el dedo.
++ *Flick* - Similar a arrastrar (drag) pero haciendolo de forma más rápida.
++ *Pinch* - Pellizcar la superfice del dispositivo usando dos dedos.
++ *Spread/Zoom* - Lo contrario que pellizcar (Pinch).
++ *Panning* - Tocar la superfice del dispositivo con la punta del dedo y moverlo en cualquier direccion sin levantar el dedo.
+
+/Flutter/ proporciona un excelente soporte para todos los tipos de gestos a través del widget exclusivo, *GestureDetector*. GestureDetector es un widget no invisible primariamente usado para detectar los gestos del usuario. Para identificar un gesto enfocado en un widget, el widget puede ser localizado dentro del widget GestureDetector. GestureDetector capturará el gesto y enviará múltiples eventos basados en el gesto. 
+
+Algunos de los gestos y su correspondiente evento se muestran a continuación - 
+
++ Tap 
+  + onTapDown
+  + onTapUp
+  + onTap 
+  + onTapCancel
++ Double Tap
+  + onDoubleTap
++ Long press 
+  + onLongPress
++ Vertical drag 
+  + onVerticalDragStart
+  + onVerticalDragUpdate
+  + onVerticalDragEnd
++ Horizontal drag
+  + onHorizontalDragStart
+  + onHorizontalDragUpdate
+  + onHorizontalDragEnd
++ Pan 
+  + onPanStart
+  + onPanUpdate
+  + onPanEnd
+
+Ahora vamos a modificar la aplicación Hello World para incluir la detección de gestos e intentar entender el concepto. 
+
++ Cambiar el contenido del cuerpo del widget /MyHomePage/ como se muestra a continuación - 
+
+#+BEGIN_SRC dart 
+  body: Center(
+    child: GestureDetector(
+      onTap: (){
+	_showDialog(context);
+      },
+      child: Text('Hello World'.)
+    )
+  ),
+#+END_SRC
+
++ Observemos que aquí hemos puesto el widget /GestureDetector/ sobre el widget /Text/ en la jerarquía de widgets, capturando el evento Tap y entonces Finalmente mostrarmoss una ventana de diálogo. 
++ Implementamos la función *_showDialog* para presentar un cuadro de diálogo cuando pulsemos el mensaje de /hello world/. Éste usa los widgets genéricos /showDialog/ y /AlertDialog/ para crear un nuevo widget de cuadro de diálogo. Es código es el siguiente - 
+
+#+BEGIN_SRC dart 
+  // función vacía definida por el usuario _showDiaglo(BuildContext context)
+  showDialog(
+    context: context, builder: (BuildContext context){
+      //devuelve objeto de tipo dialogo
+      return AlertDialog(
+	title: new Text("Message"),
+	content: new Text("Hello World"),
+	actions: <Widget>[
+	  new Flatbutton(
+	    child: new Text("Close"),
+	    onPressed: (){
+	      Navigator.of(context).pop();
+	    }
+	  )
+	]
+      );
+    }
+  )
+
+#+END_SRC
+
++ El resultado es el siguiente - 
+
+
+[[./images/gesture_helloworld.png]]
+
+
+El código completo (main.dart) es el siguiente - 
+
+
+#+BEGIN_SRC dart 
+  import 'package:flutter/material.dart';
+  void main() => runApp(MyApp());
+
+  class MyApp extends StatelessWidget{
+    // este widget es la raíz de la app.
+    @override
+    Widget build(BuildContext context){
+      return MaterialApp(
+	title: 'Hello World Demo Application',
+	theme: ThemeData( primarySwatch: Colors.blue,),
+	home: MyHomePage(title: 'Home Page'),
+      );
+    }
+  }
+
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+
+    //función definida por el usuario
+    void _showDialog(BuildContext context){
+      //función showDialog
+      contexxt: context, builder: (BuildContext context){
+	// devuelve obbjeto de tipo Dialog devolviendo AlertDialog
+	title: new Text("Message"),
+	context: new Text("Hello World"),
+	actions: <Widget>[
+	  new FlatButton(
+	    child: new Text("Close"),
+	    onPressed: ()(
+	      Navigator.of(context).pop();
+	    ),
+	  ),
+	],
+      };
+    },
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold (
+      appBar: AppBar(title: Text(this.title),),
+      body: Center(
+	child: GestureDetector(
+	  onTap: (){
+	    _showDialog(context);
+	  },
+	  child: Text('Hello World',)
+	)
+      )
+    );
+  }
+#+END_SRC
+
+Finalmente, /Flutter/ también proporciona deteción de gestor de bajo nivel a través del widget /Listener/. Éste detectará todas las intercciones del usuario y entonces disparará los siguientes eventos - 
+
++ PointerDownEvent
++ PointerMoveEvent
++ PointerUpEvent
++ PointerCancelEvent
+
+/Flutter/ también proporciona un pequeño conjunto de widgets para gestos avanzados. Estos widgets son - 
+
++ *Dismissible* - Soporta gestor de sacudir para descartar el widget 
++ *Draggable* - Soporta el gesto de arrastrar para movere el widget 
++ *LongPressDraggable* - Soporta el gesto de arrastrar para mover un widget cuando sus padres también son arrastrables
++ *IgnorePointer* - Esconde el widget y sus hijos del proceso de detección de gestos
++ *AbsorbPointer* - Para la detección de gestos de sí mismo y también cualquier widget solapado puede tamién no ser capaz de participar en la detección de gestos. 
++ *Scrollable* - Soporta ek desplazamiento del contenido dentro del widget 
+
+
+
