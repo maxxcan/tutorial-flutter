@@ -968,5 +968,665 @@ Finalmente, /Flutter/ también proporciona deteción de gestor de bajo nivel a t
 + *AbsorbPointer* - Para la detección de gestos de sí mismo y también cualquier widget solapado puede tamién no ser capaz de participar en la detección de gestos. 
 + *Scrollable* - Soporta ek desplazamiento del contenido dentro del widget 
 
+* Flutter - Manejo del Estado 
+
+Manejar el estado en una aplicación es uno de los procesos más importantes y necesarios en el ciclo de vida de una aplicación. 
+
+Consideremos un simple carrito de la compra en una aplicación. 
+
++ El usuario se logueará usando sus credenciales. 
++ Una vez el usuario esté logueado, la aplicación persitirá el estado de logueado en todas las pantallas. 
++ De nuevo, cuando el usuario seleccione un producto y lo salve en un carrito, la información del carro debe persistir entre las página hasta que el usuario compruebe el carrito. 
++ El usuario y la información de su carrito en cualquier instancia es llamado por el estado de la aplicación y esa instancia. 
+
+Una gestión del estado puede ser dividida en dos categorías
+
++ Efímero - Dura por unos pocos segundos como el estado actual de un animación o una sola página como la puntuación de un producto. /Flutter/ soporta esto a través de /StatefulWidget/. 
++ Estado de la app - Dura para la apliación entera como cuando un usuario se loguea, información del carrito, etc. /Flutter/ soporta esto a través del /scoped_movil/. 
+
+** Navegación y enrutamiento
+
+En cualquier aplicación, navegar de una página/pantalla a otra define el flujo de trabajo de la aplicación. La forma en la que una aplicación es manejada es llamada enrutamiento. /Flutter/ proporciona una clásica básica para esto - /MaterialPageRoute/ y dos métodos - /Navigator.push/ y /Navigator.pop/ para definir el flujo de trabajo de una aplicación. 
+
+*** MaterialPageRoute 
+
+/MaterialPageRoute/ es un widget usado para dibujar su UI por reemplazamiento de la pantalla entera con una animación específica de la plataforma. 
+
+: MaterialPageRoute(builder: (context) => Widget())
+
+Aquí, builder acepta una función para construir su contenido suplantando el contexto actual de la aplicación. 
+
+*** Navigation.push 
+/Navigation.push/ es usado para navegar a una nueva pantalla usando el widget /MaterialPageRoute/. 
+
+: Navigator.push( context, MaterialPageRoute(builder: (context) => Widget()), );
+
+*** Navigation.pop 
+
+/Navigation.pop/ es usado para navegar a una pantalla previa. 
+
+: Navigator.pop(context);
+
+Vamos a crear una nueva aplicación para entender mejor el concepto de navegar.
+
+Crearemos una nueva aplicación /Flutter/, product_nav_app. 
+
++ Copiamos la carpeta de los rescursos desde product_nav_app a product_state_app y añadimos los recursos dentro del archivo pubspec.yaml. 
+
+#+BEGIN_SRC yaml
+  flutter:
+    assets:
+      - assets/appimages/floppy.png
+      - assets/appimages/iphone.png
+      - assets/appimages/laptop.png
+      - assets/appimages/pendrive.png
+      - assets/appimages/pixel.png
+      - assets/appimages/tablet.png
+#+END_SRC
+
++ Reemplazamos el código que viene por defecto y añadimos nuestro código en main.dart 
+
+#+BEGIN_SRC dart 
+  import 'package:flutter/material.dart';
+  void main() => runApp(MyApp());
+
+  class MyApp extends StatelessWidget{
+    @override
+    Widget build(BuildContext context){
+      return MaterialApp(
+	title: 'Flutter Demo',
+	theme: ThemeData(
+	  primarySwatch: Colors.blue,
+	),
+	home: MyHomePage(
+	  title: 'Product state demo home page',
+	),
+      );
+    }
+  }
+
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final Stirng title;
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar(
+	  title: Text(this.title),
+	),
+	body: Center(
+	  child: Text("Hello World"),
+	),
+      );
+    }
+  }
+
+#+END_SRC
+
+
+Ahora crearemos una clase Product para organizar la información de los productos. 
+
+#+BEGIN_SRC dart 
+class Product{
+final String name;
+final String description;
+final int price;
+final String image;
+Product(this.name, this.description, this.price, this.image);
+}
+#+END_SRC
+
+Escribiremos un método getProducts en la clase Product para generar nuestro registro de productos falso. 
+
+#+BEGIN_SRC dart 
+  static List<Product> getProducts(){
+    List<Product> items = <Product>[];
+
+    items.add(
+      Product(
+	"Pixel",
+	"Pixel is the ost feature-full phone ever", 800,
+	"pixel.png"
+      )
+    );
+    items.add(
+      Product(
+	"Laptop",
+	"Laptop is most productive development tool",
+	200, "laptop.png"
+      )
+    );
+    item.add(
+      Product(
+	"Tablet",
+	"Tablet is the most useful device ever for meeting",
+	1500,
+	"tablet.png"
+      )
+    );
+    items.add(
+      Product(
+	"Pendrive",
+	"Pendrive is useful storage medium",
+	100,
+	"pendrive.png"
+      )
+    );
+    items.add(
+      Product(
+	"Floppy Drive",
+	"Flopyy drive is useful rescue storage medium",
+	20,
+	"floppy.png"
+      )
+    );
+    return items;
+  }
+  import product.dart in main.dart
+  import 'Product.dart';
+#+END_SRC
+
+Vamos a incluir nuestro nuevo widget, /RatingBox/.
+
+#+BEGIN_SRC dart 
+  class RatingBox extends StatefulWidget {
+    @override
+    _RatingBoxState createState() => _RatingBoxState();
+  }
+
+  class _RatingBoxState extens State<RatingBox>{
+    int _rating = 0;
+    void _setRatingAsOne(){
+      setState((){
+	  _rating = 1;
+      });
+    }
+    void _setRatingAsTwo(){
+      setState(() {
+	  _rating = 2;
+      });
+    }
+    void _setRatingAsThree(){
+      setState(() {
+	  _rating = 3;
+      });
+    }
+
+    Widget build(BuildContext context){
+      double _size = 20;
+      print(_rating);
+      return Row(
+	mainAxisAlignment: MainAxisAlignment.end,
+	crossAxisAlignment: CrossAxisAlignment.end,
+	mainAxisSize: MainAxisSize.max,
+	children: <Widget>[
+	  Container(
+	    padding: EdgeInsets.all(0),
+	    child: IconButton(
+	      icon: (
+		_rating >= 1?
+		Icon(
+		  Icons.star,
+		  size: _size,
+		)
+		: Icon(
+		  Icons.star_border,
+		  size: _size,
+		)
+	      ),
+	      color: Colors.red(500),
+	      onPressed: _setRatingAsOne,
+	      iconSize: _size,
+	    ),
+	  ),
+	  Container(
+	    padding: EdgeInsets.all(0),
+	    child: IconButton(
+	      icon: (
+		_rating >= 2?
+		Icon(
+		  Icons.star,
+		  size: _size,
+		)
+		: Icon(
+		  Icons.star_border,
+		  size: _size,
+		)
+	      ),
+	      color: Colors.red(500),
+	      onPressed: _setRatingAsTwo,
+	      iconSize: _size,
+	    ),
+	  ),
+	  Container(
+	    padding: EdgetInsets.all(0),
+	    child: IconButton(
+	      icon: (
+		_rating >=3?
+		Icon(
+		  Icons.star,
+		  size: _size,
+		)
+		: Icon(
+		  Icons.star_border,
+		  size: _size,
+		)
+	      ),
+	      color: Colors.red(500),
+	      onPressed: _setRatingAsThree,
+	      iconSize: _size,
+	    ),
+	  ),
+	],
+      );
+    }
+  }
+#+END_SRC
+
+Ahora vamos a modificar nuestro widgeet /ProductBox/ para que funcione con nuestra nueva clase /Product/. 
+
+#+BEGIN_SRC dart 
+  class ProductBox extends StatelessWidget{
+    ProductBox({Key key, this.item}) : super(key: key);
+    final Product item;
+
+    Widget build(BuildContext context){
+      return Container(
+	padding: EdgeInsets.all(2),
+	height: 140,
+	child: Card(
+	  child: Row(
+	    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+	    children: <Widget>[
+	      Image.asset("assets/appimages/" + this.item.image),
+	      Expanded(
+		child: Container(
+		  padding: EdgeInsets.all(5),
+		  child: Column(
+		    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+		    children: <Widget>[
+		      Text(this.item.name,
+			stye: TextStyle(fontWeight: FontWeight.bold)),
+		      Text(this.item.description),
+		      Text("Price: " + this.item.price.toString()),
+		      RatingBox(),
+		    ],
+		  )
+		)
+	      )
+	    ]
+	  ),
+	)
+      );
+    }
+  }
+#+END_SRC
+
+
+Vamos a reescribir nuestro widget /MyHomePage/ para que funcione con el modelo /Product/ y liste todos los productos usando /ListView/.
+
+#+BEGIN_SRC dart 
+  class MyHomePage extends StatelessWidget {
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+    final items = Product.geetProducts();
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(appBar: AppBar(title: Text("Product Navigation")),
+	body: ListView.builder(
+	  itemCount: items.length,
+	  itemBuilder: (context, index){
+	    return GestureDetector(
+	      child: ProductBox(item: items[items]),
+	      onTap: () {
+		Navigator.push(
+		  context, MaterialPageRoute(
+		    builder: (context) => ProductPage(item: items [index]),
+		  ),
+		);
+	      },
+	    );
+	  },
+      ));
+    }
+  }
+#+END_SRC
+
+
+Hemos usado /MaterialPageRoute/ para navegar a la página de detalles de producto. 
+
+Ahora, vamos a añadir /ProductPage/ para mostrar el detalle del producto. 
+
+#+BEGIN_SRC dart 
+  class ProductPage extends StatelessWidget {
+    ProductPage({Key key}) : super(key: key);
+    final Product item;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appbar: AppBar(
+	  title: Text(this.item.name),
+	),
+	body: Center(
+	  child: Container(
+	    padding: EdgeInsets.all(0),
+	    child: Column(
+	      mainAxisAlignment: MainAxisAlignment.start,
+	      crossAxisAlignment: CrossAxisAlignment.start,
+	      children: <Widget>[
+		Image.asset("assets/appimages/" + this.item.image),
+		Expanded(
+		  child: Container(
+		    padding: EdgeInsets.all(5),
+		    child: Columns(
+		      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+		      children: <Widget>[
+			Text(
+			  this.item.name, style: TextStyle(
+			    fontWeight: FontWeight.bold
+			  )
+			),
+			Text(this.item.description),
+			Text("Price: " + this.item.price.toString()),
+			RatingBox,
+		      ],
+		    )
+		  )
+		)
+	      ]
+	    ),
+	  ),
+	),
+      );
+    }
+  }
+#+END_SRC
+
+
+El código completo de la aplicación es el siguiente - 
+
+#+BEGIN_SRC dart 
+import 'package:flutter/material.dart'; 
+void main() => runApp(MyApp()); 
+
+class Product {
+   final String name; 
+   final String description; 
+   final int price; 
+   final String image; 
+   Product(this.name, this.description, this.price, this.image); 
+   
+   static List<Product> getProducts() {
+      List<Product> items = <Product>[]; 
+      items.add(
+         Product(
+            "Pixel", 
+            "Pixel is the most featureful phone ever", 
+            800, 
+            "pixel.png"
+         )
+      );
+      items.add(
+         Product(
+            "Laptop", 
+            "Laptop is most productive development tool", 
+            2000, 
+            "laptop.png"
+         )
+      ); 
+      items.add(
+         Product(
+            "Tablet", 
+            "Tablet is the most useful device ever for meeting", 
+            1500, 
+            "tablet.png"
+         )
+      ); 
+      items.add(
+         Product( 
+            "Pendrive", 
+            "iPhone is the stylist phone ever", 
+            100, 
+            "pendrive.png"
+         )
+      ); 
+      items.add(
+         Product(
+            "Floppy Drive", 
+            "iPhone is the stylist phone ever", 
+            20, 
+            "floppy.png"
+         )
+      ); 
+      items.add(
+         Product(
+            "iPhone", 
+            "iPhone is the stylist phone ever", 
+            1000, 
+            "iphone.png"
+         )
+      ); 
+      return items; 
+   }
+}
+class MyApp extends StatelessWidget {
+   // This widget is the root of your application. 
+   @override 
+   Widget build(BuildContext context) {
+      return MaterialApp(
+         title: 'Flutter Demo', 
+         theme: ThemeData( 
+            primarySwatch: Colors.blue, 
+         ), 
+         home: MyHomePage(title: 'Product Navigation demo home page'), 
+      ); 
+   }
+}
+class MyHomePage extends StatelessWidget {
+   MyHomePage({Key key, this.title}) : super(key: key); 
+   final String title; 
+   final items = Product.getProducts(); 
+   
+   @override 
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: AppBar(title: Text("Product Navigation")), 
+         body: ListView.builder( 
+            itemCount: items.length, 
+            itemBuilder: (context, index) { 
+               return GestureDetector( 
+                  child: ProductBox(item: items[index]), 
+                  onTap: () { 
+                     Navigator.push( 
+                        context, 
+                        MaterialPageRoute( 
+                           builder: (context) => ProductPage(item: items[index]), 
+                        ), 
+                     ); 
+                  }, 
+               ); 
+            }, 
+         )
+      ); 
+   }
+} 
+class ProductPage extends StatelessWidget {
+   ProductPage({Key key, this.item}) : super(key: key); 
+   final Product item; 
+   
+   @override 
+   Widget build(BuildContext context) {
+      return Scaffold(
+         appBar: AppBar(
+            title: Text(this.item.name), 
+         ), 
+         body: Center(
+            child: Container( 
+               padding: EdgeInsets.all(0), 
+               child: Column( 
+                  mainAxisAlignment: MainAxisAlignment.start, 
+                  crossAxisAlignment: CrossAxisAlignment.start, 
+                  children: <Widget>[ 
+                     Image.asset("assets/appimages/" + this.item.image), 
+                     Expanded( 
+                        child: Container( 
+                           padding: EdgeInsets.all(5), 
+                           child: Column( 
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+                              children: <Widget>[ 
+                                 Text(this.item.name, style: TextStyle(fontWeight: FontWeight.bold)), 
+                                 Text(this.item.description), 
+                                 Text("Price: " + this.item.price.toString()), 
+                                 RatingBox(), 
+                              ], 
+                           )
+                        )
+                     ) 
+                  ]
+               ), 
+            ), 
+         ), 
+      ); 
+   } 
+}
+class RatingBox extends StatefulWidget { 
+   @override 
+   _RatingBoxState createState() => _RatingBoxState(); 
+} 
+class _RatingBoxState extends State<RatingBox> { 
+   int _rating = 0;
+   void _setRatingAsOne() {
+      setState(() {
+         _rating = 1; 
+      }); 
+   }
+   void _setRatingAsTwo() {
+      setState(() {
+         _rating = 2; 
+      }); 
+   } 
+   void _setRatingAsThree() { 
+      setState(() {
+         _rating = 3; 
+      }); 
+   }
+   Widget build(BuildContext context) {
+      double _size = 20; 
+      print(_rating); 
+      return Row(
+         mainAxisAlignment: MainAxisAlignment.end, 
+         crossAxisAlignment: CrossAxisAlignment.end, 
+         mainAxisSize: MainAxisSize.max, 
+         children: <Widget>[
+            Container(
+               padding: EdgeInsets.all(0), 
+               child: IconButton(
+                  icon: (
+                     _rating >= 1 ? Icon( 
+                        Icons.star, 
+                        size: _size, 
+                     ) 
+                     : Icon( 
+                        Icons.star_border, 
+                        size: _size, 
+                     )
+                  ), 
+                  color: Colors.red[500], 
+                  onPressed: _setRatingAsOne, 
+                  iconSize: _size, 
+               ), 
+            ), 
+            Container(
+               padding: EdgeInsets.all(0), 
+               child: IconButton( 
+                  icon: (
+                     _rating >= 2 ? 
+                     Icon( 
+                        Icons.star, 
+                        size: _size, 
+                     ) 
+                     : Icon( 
+                        Icons.star_border, 
+                        size: _size, 
+                     )
+                  ), 
+                  color: Colors.red[500], 
+                  onPressed: _setRatingAsTwo, 
+                  iconSize: _size, 
+               ), 
+            ), 
+            Container(
+               padding: EdgeInsets.all(0), 
+               child: IconButton(
+                  icon: (
+                     _rating >= 3 ? 
+                     Icon( 
+                        Icons.star, 
+                        size: _size, 
+                     )
+                     : Icon( 
+                        Icons.star_border, 
+                        size: _size, 
+                     )
+                  ), 
+                  color: Colors.red[500], 
+                  onPressed: _setRatingAsThree, 
+                  iconSize: _size, 
+               ), 
+            ), 
+         ], 
+      ); 
+   } 
+} 
+class ProductBox extends StatelessWidget {
+   ProductBox({Key key, this.item}) : super(key: key); 
+   final Product item; 
+   
+   Widget build(BuildContext context) {
+      return Container(
+         padding: EdgeInsets.all(2), 
+         height: 140, 
+         child: Card(
+            child: Row(
+               mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+               children: <Widget>[ 
+                  Image.asset("assets/appimages/" + this.item.image), 
+                  Expanded( 
+                     child: Container( 
+                        padding: EdgeInsets.all(5), 
+                        child: Column( 
+                           mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+                           children: <Widget>[ 
+                              Text(this.item.name, style: TextStyle(fontWeight: FontWeight.bold)), Text(this.item.description), 
+                              Text("Price: " + this.item.price.toString()), 
+                              RatingBox(), 
+                           ], 
+                        )
+                     )
+                  ) 
+               ]
+            ), 
+         )
+      ); 
+   } 
+}
+
+#+END_SRC
+
+Cuando ejecutemos la aplicación y pinchemos en uno de los productos, se mostrará la página de detalle del produccto. Podemos volver a la página de inicio pinchando en el botón de vuelta. La página de lista de productos y la página de los detalles del producto se muestran a continuación. 
+
+[[./images/pagina_producto.png]]
+
+
+[[./images/detalle-producto.png]]
+
+
+* Flutter - Animación 
+
+La animación es un procedimiento complejo en cualquier aplicación móvil. A pesar de esta complejidad, la Animación mejora la experiencia del usuario a un nuevo nivel y proporciona una interacción rica con el usuario. Previsto a esta riqueza, la animación se convierte en un parte integral de las aplicaciones móviles modernas. El framework /Flutter/ reconoce la importancia de la animación y proporciona un framework simple e intuitivo para desarrollar todo tipo de animaciones. 
+
+** Introducción 
 
 
