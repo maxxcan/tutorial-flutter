@@ -2093,4 +2093,273 @@ Compilando y ejecutando la aplicación para ver el resultado. La versión inicia
 [[./images/version-final.png]]
 
 
+* Escribiendo Código Específico para Android 
+
+Flutter proporciona un framework gneral para acceder a características específicas de una plataforma. Esto habilita a el desarrollador para extender la funcionalidad del framework /Flutter/ usando código específico de la plataforma. Funcionalidades específicas de la plataforma como la cámara, batería, navegador, etc, pueden ser accesibles fácilmente a través del framework. 
+
+La idea general de acceso al código específico de plataforma es a través de un simple protocolo de mensajería. El código de Flutter, Cliente y el código de la plataforma y los enlaces al hospedador en un canal común de Mensajería. El cliente envía mensajes al hospedador a través  del Canal de Mensajería. El hospedador escucha en el Canal de Mensajería, recive el mensaje y hace la funcionalidad necesaria y finalmente, devuelve el resultado al cliente a través del Canal de Mensajería. 
+
+El código de arquitectura específico de plataforma es mostrada en el diagrama a continuación - 
+
+[[./images/canal-mensajeria.png]]
+
+
+El protocolo de Mensajería usa un codec estándar de Mensajería (clase /StandardMessageCodec/) que soporta la serialización de binarios de valores tipo JSON tales como números, cadenas de texto, booleanos, etc. La serialización y la deserealización funciona de forma transparente entre el cliente y el hospedador. 
+
+Vamos a escriir una aplicación simple para abrir un navegador usando el SDK de Android y entendiendo cómo - 
+
++ Creamos una nueva aplicación /Flutter/ llamada, /flutter_browser_app/
++ Reemplazamos el código de main.dat por el siguiente - 
+
+#+BEGIN_SRC dart 
+  import 'package:flutter/material.dart';
+  void main() => runApp(MyApp());
+  class MyApp extends StatelessWidget{
+    @override
+    Widget build(BuildContext context){
+      return MaterialApp(
+	title: 'Flutter Demo',
+	theme: ThemeData(
+	  primarySwatch: Color.blue,
+	),
+	home: MyHomePage(title: 'Flutter Demo Home Page'),
+      );
+    }
+  }
+
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title}) : super(key: key);
+    final String title;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	app:AppBar(
+	  title: Text(this.title),
+	),
+	body: Center(
+	  child: RaisedButton(
+	    child: Text('Open Browser'),
+	    onPressed: null,
+	  ),
+	),
+      );
+    }
+  }
+#+END_SRC
+
+
++ Aquí hemos creado un nuevo botón para abrir el navegador y establecemos que el método /onPressed/ como null.
++ Ahora, importamos los siguientes paquetes - 
+
+#+BEGIN_SRC dart 
+  import 'dart:async';
+  import 'package:flutter/services.dart';
+#+END_SRC
+
++ /services.dart/ incluye la funcionalidad de invocar código específico de plataforma.
++ Crearemos un nuevo canal de Mensajería en el widget /MyHomePage/.
+
+#+BEGIN_SRC dart 
+  static const platform = const
+  Method Channel('flutterapp.tutorialspoint.com/browser');
+#+END_SRC
+
+Escribimos un método /_openBrowser/ para invocar el método específico de plataforma a través del canal de Mensajería. 
+
+#+BEGIN_SRC dart 
+  Future<void> _openBrowser() async {
+    try {
+      final int result = await platform.invokeMethod(
+	'openBrowser', <String, String>{
+	  'url': "https://flutter.dev"
+	}
+      );
+    }
+    on PlatformException catch (e) {
+      // no se puede abrir el navegador
+      print(e);
+    }
+  }
+#+END_SRC
+
+Aquí hemos usado /platform.invokeMethod/ para invocar /openBrowser/ (explicado en los siguientes pasos). /openBrowser/ tien un argumento, /url/ para abrir una url especifica. 
+
++ Cambiamos el valor de la propiedad /onPressed/ en /RaisedButton/ de null a /_openBrowser/. 
+
+#+BEGIN_SRC dart 
+onPressed: _openBrowser,
+#+END_SRC
+
++ Abrimos /MainActivity.java/ (dentro de la carpeta Android) e importamos la bibliotecas requeridas. 
+
+#+BEGIN_SRC java 
+  import android.app.Activity;
+  import android.content.Intent;
+  import android.net.Uri;
+  import android.os.Bundle;
+
+  import io.flutter .app.FlutterActivity;
+  import io.flutter .plugin.common.MethodCall;
+  import io.flutter .plugin.common.MethodChannel;
+  import io.flutter .plugin.common.MethodChannel.MethodCallHandler;
+  import io.flutter .plugin.common.MethodChannel.Result;
+  import io.flutter .plugin.GeneratedPluginRegistrant;
+#+END_SRC
+
++ Escribimos un método, /openBrowser/ para abrir el navegador 
+
+#+BEGIN_SRC java 
+  private void openBrowser(MethodCall call, Result result, String url){
+      Activity activity = this;
+      if (activity == null){
+	  result.error("ACTIVITY_NOT_AVAILABLE",
+		       "Browser cannot bbe opened without foreground
+		       activity", null);
+	  return;
+      }
+      Intent intent = new Intent(Intent.ACTION_VIEW);
+      intent.setData(Uri.parse(url));
+
+      activity.startActivity(intent);
+      result.success((Object) true);
+  }
+#+END_SRC
+
++ Ahora, establecemos el nombre del canal en la clase /MainActivity/ - 
+
+#+BEGIN_SRC java 
+  private static final String CHANNEL = "flutterapp.tutorials.point.com/browser";
+#+END_SRC
+
++ Escribimos un código específico de android que establece el mensaje manejado en el método /onCreate/ - 
+
+
+#+BEGIN_SRC java 
+  new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler(
+								    new MethodCallHandler(){
+									@Override
+									public void onMethodCall(MethodCall call, Result result) {
+									    String url = call.argument("url");
+									    if (call.method.equals("openBrowser")) {
+										openBrowser(call, result, url);
+									    } else {
+										result.notImplemented();
+									    }
+									}
+								    });
+#+END_SRC
+
+Aquí, hemos creado un canal de Mensajería usando la clase /MethodChannel/ y usando la clase /MethodCallHandler/ para manejar el mensaje. /onMethodCall/ es el verdadero método responsable para llamar al código específico de plataforma comprobando el mensaje. El método /onMethodCall/ extrae la url del mesnaje y entonces invoca /openBrowser/ solo cuando el método llamado es /openBrowser/. De otra forma, devolverá el método /notImplemented/. 
+
+El código completo de la aplicación es el siguiente - 
+
+
+*MainActivity.java* 
+
+#+BEGIN_SRC java 
+  package com.tutorialspoint.flutterapp .flutter_browser_app;
+
+  import android.app.Activity;
+  import android.content.Intent;
+  import android.net.Uri;
+  import android.os.Bundle;
+  import io.flutter .app.FlutterActivity;
+  import io.flutter .plugin.common.MethodCall;
+  import io.flutter .plugin.common.MethodChannel.Result;
+  import io.flutter .plugin.GeneratedPluginRegistrant;
+
+  public class MainActivity extends FlutterActivity {
+      private static final String CHANNEL = "flutterapp.tutorialspoint.com/browser" ;
+      @Override
+      protected void onCreate(Bundle savedInstanceState) {
+	  super.onCreate(savedInstanceState);
+	  GeneratedPluginRegistrant.registerWith(this);
+	  new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler(
+									    new MethodCallHandler(){
+										@Override
+										public void onMethodCall(MethodCall call, Result result){
+										    String url = call.argument("url");
+										    if (call.method.equals("openBrowser")) {
+											openBrowser(call, result, url);
+										    } else {
+											result.notImplemented();
+										    }
+										}
+									    }
+									    );
+      }
+      private void openBrowser(MethodCall call, Result result, String url) {
+	  Activity activity = this; if (activity == null) {
+	      result.error(
+			   "ACTIVITY_NOT_AVAILABLE", "Browser cannot be openned without foreground activity", null
+			   );
+	      return;
+	  }
+	  Intent intent = new Intent(Intent.ACTION_VIEW);
+	  intent.setData(Uri.parse(url));
+	  activity.startActivity(intent);
+	  result.success((Object) true);
+      }
+  }
+#+END_SRC
+
+
+*main.dart* 
+
+ #+BEGIN_SRC dart 
+   import 'package:flutter/material.dart';
+   import 'dart:async';
+   import 'package:flutter/services.dart';
+
+   void main() => runApp(MyApp());
+   class MyApp extends StatelessWidget{
+     @override
+     Widget build(BuildContext context){
+       return MaterialApp(
+	 title: 'Flutter Demo',
+	 theme: ThemeData(
+	   primarySwatch: Colors.blue,
+	 ),
+	 home: MyHomePage(
+	   title: 'Flutter Demo Home Page'
+	 ),
+       );
+     }
+   }
+   class MyHomePage extends StatelessWidget{
+     MyHomePage({Key key, this.title}) : super(key: key);
+     final String title;
+     static const platform = const MethodChannel('flutterapp.tutorialspoint.com/browser');
+     Future<void> _openBrowser() async {
+       try {
+	 final int result = await platform.invokeMethod('openBrowser', <String, String>{
+	     'url': "https://flutter.dev"
+	 });
+       }
+       on PlatformException catch (e) {
+	 // no se puede abrir el navegador
+	 print(e);
+       }
+     }
+     @override
+     Widget build(BuildContext context){
+       return Scaffold(
+	 appBar: AppBar(
+	   title: Text(this.title),
+	 ),
+	 body: Center(
+	   child: Text('Open Browser'),
+	   onPressed: _openBrowser,
+	 ),
+       );
+     }
+   }
+#+END_SRC
+
+Ejecutamos la aplicación y pinchamos en el botón /Open Browser/ y veremos como se lanza el navegador. Vemos una imagen de cómo quedaría. 
+
+[[./images/demo-navegador.png]]
+
+[[./images/demo-navegador2.png]]
 
