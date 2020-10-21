@@ -1629,4 +1629,468 @@ La animación es un procedimiento complejo en cualquier aplicación móvil. A pe
 
 ** Introducción 
 
+La animación es un proceso que muestra una serie de imágenes en un orden particular con una duración específica para dar la sensación de movimiento. El aspecto más importante de la animación es lo siguiente - 
+
++ La animación tiene dos valores distintos: Valor de Inicio y valor Final. La animación empieza desde el valor de Inicio y va a través de una serie de valores intermedios y Finalmente termina en el valor Final. Por ejemplo, para animar un widget que desaparezca, el valor inicial será la opacidad total y el valor final será la cero opacidad. 
+
++ Los valoress intermedios pueden ser lineales o no-lineales (curva) y pueden ser configurados. Ententiendo qu la animación funciona como esté configurada. Cada configuración proporciona una sensación diferente a la animación. Por ejemplo, un widget que desaparece será linear mientras que el bote de una pelota no lo será. 
+
++ La duración del proceso de animación afecta la velocida (más rápido o más lento) de la animación. 
+
++ La habilidad para controlar el proceso de la animación como el inicio de la animación, la parada, la repetición un número de veces, el proceso de retroceso, etc.
+
++ En /Flutter/, el sistema de animación no hacer una animación real. En vez de eso, proporciona solo los valores requeridos a cada cuadro para dibujar las imágenes. 
+
+** Clases para la animación 
+
+El sistema de animación de /Flutter/ está basado en objetos animados. El núcleo de las clases para la animación y su uso es el siguiente - 
+
+***  Animation 
+
+Genera valores intermedios entre dos valores de una cierta duración. Las clases más comunes son - 
+
++ *Animation<double>* - Intercala valores entre dos números decimales
++ *Animation<Color>* - Intercala colores entre dos colores 
++ *Animation<Size>* - Intercala tamaños entre dos tamaños 
++ *AnimationController* - Objeto especial de animación para controlar la animación en sí misma. Genera nuevos valores cuando la aplicación esté preparada para un nuevo cuadro. Soporta animación linear y los valores empiezan desde 0.0 hasta 1.0
+
+#+BEGIN_SRC dart 
+controller = AnimationController(duration: cont Duration(secons: 2), vsync: this);
+#+END_SRC
+
+
+
+*** CurvedAnimation 
+
+Similar a AnimationController pero soporta animación no-linear. CurvedAnimation puede ser usada con objetos de animación tal como sigue - 
+
+#+BEGIN_SRC dart 
+controller = AnimationController(duration: const Duration(seconds: 2), vsync: this);
+animation = CurvedAnimation(parent: controller, curve: Curves.easeIn)
+#+END_SRC
+
+*** Tween<T>
+
+Derivado de Animatable<T> y usado para generar números entre dos números además de 0 y 1. Puede ser usado junto con objetos de Animación usando el método animate y pasando el verdadero objeto Animation. 
+
+#+BEGIN_SRC dart 
+  AnimationController controller = AnimationController(
+    duration: const Duration(milliseconds: 1000),
+    vsync: this); Animation<int> customTween = IntTween(
+    begin: 0, end: 255).animate(controller);
+  )
+#+END_SRC
+
++ Tween puede usarse junto con CurvedAnimation - 
+
+#+BEGIN_SRC dart 
+  AnimationController controller = AnimationController(
+    duration: const Duration(milliseconds: 500), vsync: this);
+  final Animation curve = CurvedAnimation(parent: controller, curve: Curves.easeOut);
+  Animation<Int> customTween = IntTween(begin: 0, end: 255).animate(curve);
+#+END_SRC
+
+Aquí, controller es el verdadero cotrolador de la animación. La curva proporciona el tipo de no-linear y el customTween proporciona el rango desde 0 a 255.
+
+** Flujo de trabajo de la Animación en Flutter 
+
+El flujo de trabajo de la animación es el siguiente - 
+
++ Definir y empezar el controlador de la animación en el initState del StatefulWidget. 
+
+#+BEGIN_SRC dart 
+AnimationController(duration: const Duration(seconds: 2), vsync: this);
+animation = Tween<double>(begin: 0, end: 300).animate(controller);
+controller.forward();
+#+END_SRC
+
++ Añadir un escuchante con addListener para cambiar el estado del widget. 
+
+#+BEGIN_SRC dart 
+  animation = Tween<double>(begin: 0, end: 300).animate(controller) .addListener(() {
+      setState(() {
+	  // El estado que ha cambiado aquí es el valor del objeto animación
+      });
+  });
+#+END_SRC
+
++ Widgets empotrados, AnimatedWidget y AnimatedBuilder pueden ser usados para escapar de este proceso. Ámbos widgets aceptan objetos de Animación y obtienen los valores requeridos para la animación. 
+
++ Obtener los valores de la animación durante el proceso de construcción del widget y entonces aplicarlo para ancho, alto o cualquier propiedad relevante en vez del valor original. 
+
+#+BEGIN_SRC dart 
+  child: Container(
+    height: animation.value,
+    width: animation.value,
+    child: <Widget>,
+  )
+#+END_SRC
+
+** Aplicación funcionando 
+
+Vamos a escribir una animación simple basada en la aplicación para entender el concepto de la animación en /Flutter/. 
+
++ Creamos una nueva aplicación /Flutter/ llamada, product_animation_app. 
++ Copiamos los recursos de la carpeta asset desde product_nav_app a product_animation_app y añadimos esos recursos dentro del archivo pubspec.yaml 
+
+#+BEGIN_SRC yaml 
+  flutter :
+    assets:
+      - assets/appimages/floppy.png
+      - assets/appimages/iphone.png
+      - assets/appimages/laptop.png
+      - assets/appimages/pendrive.png
+      - assets/appimages/pixel.png
+      - assets/appimages/tablet.png
+    
+#+END_SRC
+
++ Eliminamos el código que viene por defecto en main.dart 
++ Añadimos e importamos lo básico 
+
+#+BEGIN_SRC dart 
+import 'package:flutter/material.dart';
+void main() => runApp(MyApp());
+#+END_SRC
+
++ Creamos el widget MyApp derivado de StatefulWidget
+
+#+BEGIN_SRC dart 
+  class MyApp extends StatefulWidget (
+    _MyAppState createState() => _MyAppState();
+  )
+#+END_SRC
+
++ Creamos el widget _MyAppState e implementamos initState y disponemos además para construir el método por defecto. 
+
+#+BEGIN_SRC dart 
+  class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin{
+    Animation<double> animation;
+    AnimationController controller;
+    @override void initState() {
+      super.initState();
+      controller = AnimationController(
+	duration: const Duration(seconds: 10), vsync: this
+      );
+      animation = Tween<double>(begin: 0.0, end: 1.0).animate(controller);
+      controller.forward();
+    }
+    // Este widget es el raíz de nuetra aplicación
+    @override
+    Widget build(BuildContext context){
+      controller.forward();
+      return MaterialApp(
+	title: 'Flutter Demo',
+	theme: ThemeData(primarySwatch: Colors.blue,),
+	home: MyHomePage(title: 'Product layout demo home page', animation: animation, )
+      );
+    }
+    @override
+    void dispose(){
+      controller.dispose();
+      super.dispose();
+    }
+  }
+#+END_SRC
+
+
+Aquí 
+
++ En el método /initState/, hemos creado un controlador para la animación (controlador), un objeto animación (animación) y empezamos la animación usando /controller.forward/. 
+
++ En el método /dispose/, hemos dispuesto el objeto controlador de la animación (controlador).
+
++ En el método /build/, enviamos la animación al widget /MyHomePage/ a través del constructor. Ahora, el widget /MyHomePage/ puede usar el objeto animación para animar su contenido. 
+
++ Ahora, añadiremos el widget /ProductBox/ 
+
+#+BEGIN_SRC dart 
+  class ProductBox extends StatelessWidget{
+    ProductBox({Key key, this.name, this.description, this.price, this.image}) : super(key: key);
+    final String name;
+    final String description;
+    final int price;
+    final String image;
+
+    Widget build(BuildContext context){
+      return Container(
+	padding: EdgeInsets.all(2),
+	height: 140,
+	child: Card(
+	  child: Row(
+	    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+	    children: <Widget>[
+	      Image.asset("assets/appimages/" + image),
+	      Expanded(
+		child: Container(
+		  padding: EdgetInsets.all(5),
+		  child: Column(
+		    mainAxisAlignment: MainAxisAlignment.spaceEVenly,
+		    children: <Widget>[
+		      Text(this.name, style:
+			TextStyle(fontWeight: FontWeight.bold)),
+		      Text(this.description),
+		      Text("Price: " + this.price.toString()),
+		    ],
+		  )
+		)
+	      )
+	    ]
+	  )
+	)
+      );
+    }
+  }
+#+END_SRC
+
+Creamos un nuevo Widget, /MyAnimatedWidget/ para hacer una simple animación de desaparición usando opacidad. 
+
+
+#+BEGIN_SRC dart 
+  class MyAnimatedWidget extends StatelessWidget {
+    MyAnimatedWidget({this.child, this.animation});
+
+    final Widget child;
+    final Animation<double> animation;
+
+    Widget build(BuildContext context) => Center(
+      child: AnimatedBuilder(
+	animation: animation,
+	builder: (context, child) => Container(
+	  child: Opacity(opacity: animation.value child: child),
+	),
+	child: child,
+      );
+    )
+  }
+#+END_SRC
+
++ Aquí, hemos usado /AnimatedBuilder/ para hacer nuestra animación. /AnimatedBuilder/ es un widget el cual construye su contenido mientras hace la animación al mismo tiempo. Acepta un objeto animación para obtener el valor actual de la animación. Hemos usado el valor de la animación, /animation.value/ para establecer la opacidad del widget /child/. En efecto, el widget animará el widget /child/ usando el concepto de opacidad. 
++ Finalmente, creamos el widget /MyHomePage/ y usamos el objeto animación para animar su contenido. 
+
+#+BEGIN_SRC dart 
+  class MyHomePage extends StatelessWidget{
+    MyHomePage({Key key, this.title, this.animation}) : super(key: key);
+
+    final String title;
+    final Animation<double>
+    animation;
+
+    @override
+    Widget build(BuildContext context){
+      return Scaffold(
+	appBar: AppBar(title: Text("Product Listing")),body: ListView(
+	  shrinkWrap: true,
+	  padding: const EdgeInsets.fromLTRB(2.0, 10.0, 2.0, 10.0),
+	  children: <Widget>[
+	    FadeTransition(
+	      child: ProductBox(
+		name: "iPhone",
+		description: "iPhone is the stylist phone ever",
+		price: 1000,
+		image: "iphone.png"
+	      ), opacity: animation
+	    ),
+	    MyAnimatedWidget(child: ProductBox(
+		name: "Pixel",
+		description: "Pixel is the most featureful phone ever",
+		price: 800,
+		image: "pixel.png"
+	    ), animation: animation),
+	    ProductBox(
+	      name: "Laptop",
+	      description: "Laptop is most productive development tool",
+	      price: 2000,
+	      image: "laptop.png"
+	    ),
+	    ProductBox(
+	      name: "Tablet",
+	      description: "Tablet is the mos useful device ever for meeting",
+	      price: 1500,
+	      image: "tablet.png"
+	    ),
+	    ProductBox(
+	      name: "Pendrive",
+	      description: "Pendrive is useful storage medium",
+	      price: 100,
+	      image: "pendrive.png"
+	    ),
+	    ProductBox(
+	      name: "Floppy Drive",
+	      description: "Floppy drive is useful rescue storage medium",
+	      price: 20,
+	      image: "floppy.png"
+	    ),
+	  ],
+	)
+      );
+    }
+  }
+#+END_SRC
+
+
+Aquí, hemos usado /FadeAnimation/ y /MyAnimationWidget/ para animar el primer elemento de la lista. /FadeAnimation/ es una clase de animación construida, la cual hemos usado para animar su hijo usando el concepto de opacidad. 
+
++ El código completo es el siguiente: - 
+
+#+BEGIN_SRC dart 
+
+  import 'package:flutter/material.dart'; 
+  void main() => runApp(MyApp()); 
+
+  class MyApp extends StatefulWidget { 
+     _MyAppState createState() => _MyAppState(); 
+  } 
+  class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
+     Animation<double> animation; 
+     AnimationController controller; 
+   
+     @override 
+     void initState() {
+	super.initState(); 
+	controller = AnimationController(
+	   duration: const Duration(seconds: 10), vsync: this); 
+	animation = Tween<double>(begin: 0.0, end: 1.0).animate(controller); 
+	controller.forward(); 
+     } 
+     // This widget is the root of your application. 
+     @override 
+     Widget build(BuildContext context) {
+	controller.forward(); 
+	return MaterialApp( 
+	   title: 'Flutter Demo', theme: ThemeData(primarySwatch: Colors.blue,), 
+	   home: MyHomePage(title: 'Product layout demo home page', animation: animation,) 
+	); 
+     } 
+     @override 
+     void dispose() {
+	controller.dispose();
+	super.dispose(); 
+     } 
+  }
+  class MyHomePage extends StatelessWidget { 
+     MyHomePage({Key key, this.title, this.animation}): super(key: key);
+     final String title; 
+     final Animation<double> animation; 
+   
+     @override 
+     Widget build(BuildContext context) {
+	return Scaffold(
+	   appBar: AppBar(title: Text("Product Listing")), 
+	   body: ListView(
+	      shrinkWrap: true, 
+	      padding: const EdgeInsets.fromLTRB(2.0, 10.0, 2.0, 10.0), 
+	      children: <Widget>[
+		 FadeTransition(
+		    child: ProductBox(
+		       name: "iPhone", 
+		       description: "iPhone is the stylist phone ever", 
+		       price: 1000, 
+		       image: "iphone.png"
+		    ), 
+		    opacity: animation
+		 ), 
+		 MyAnimatedWidget(
+		    child: ProductBox( 
+		       name: "Pixel", 
+		       description: "Pixel is the most featureful phone ever", 
+		       price: 800, 
+		       image: "pixel.png"
+		    ), 
+		    animation: animation
+		 ), 
+		 ProductBox( 
+		    name: "Laptop", 
+		    description: "Laptop is most productive development tool", 
+		    price: 2000, 
+		    image: "laptop.png"
+		 ), 
+		 ProductBox(
+		    name: "Tablet",
+		    description: "Tablet is the most useful device ever for meeting",
+		    price: 1500, 
+		    image: "tablet.png"
+		 ), 
+		 ProductBox(
+		    name: "Pendrive", 
+		    description: "Pendrive is useful storage medium", 
+		    price: 100, 
+		    image: "pendrive.png"
+		 ), 
+		 ProductBox(
+		    name: "Floppy Drive", 
+		    description: "Floppy drive is useful rescue storage medium", 
+		    price: 20, 
+		    image: "floppy.png"
+		 ), 
+	      ], 
+	   )
+	); 
+     } 
+  } 
+  class ProductBox extends StatelessWidget { 
+     ProductBox({Key key, this.name, this.description, this.price, this.image}) :
+	super(key: key);
+     final String name; 
+     final String description; 
+     final int price; 
+     final String image; 
+     Widget build(BuildContext context) {
+	return Container(
+	   padding: EdgeInsets.all(2), 
+	   height: 140, 
+	   child: Card(
+	      child: Row(
+		 mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+		 children: <Widget>[ 
+		    Image.asset("assets/appimages/" + image), 
+		    Expanded(
+		       child: Container( 
+			  padding: EdgeInsets.all(5), 
+			  child: Column( 
+			     mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+			     children: <Widget>[ 
+				Text(
+				   this.name, style: TextStyle(
+				      fontWeight: FontWeight.bold
+				   )
+				), 
+				Text(this.description), Text(
+				   "Price: " + this.price.toString()
+				), 
+			     ], 
+			  )
+		       )
+		    ) 
+		 ]
+	      )
+	   )
+	); 
+     } 
+  }
+  class MyAnimatedWidget extends StatelessWidget { 
+     MyAnimatedWidget({this.child, this.animation}); 
+     final Widget child; 
+     final Animation<double> animation; 
+ 
+     Widget build(BuildContext context) => Center( 
+	child: AnimatedBuilder(
+	   animation: animation, 
+	   builder: (context, child) => Container( 
+	      child: Opacity(opacity: animation.value, child: child), 
+	   ), 
+	   child: child
+	), 
+     ); 
+  }
+#+END_SRC
+
+
+Compilando y ejecutando la aplicación para ver el resultado. La versión inicial y final de la aplicación es la siguiente - 
+
+[[./images/version-inicial.png]]
+
+[[./images/version-final.png]]
+
+
 
